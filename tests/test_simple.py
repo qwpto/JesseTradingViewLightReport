@@ -4,7 +4,7 @@
 
 import unittest
 
-# from JesseReportDiscord import sendJesseReportToDiscord
+# from JesseTradingViewLightReport import generateReport
 
 
 class TestSimple(unittest.TestCase):

@@ -22,9 +22,9 @@ setup(
     # package, this name will be registered for you. It will determine how
     # users can install this project, e.g.:
     #
-    # $ pip install jesse-report-discord
+    # $ pip install JesseTradingViewLightReport
     #
-    # And where it will live on PyPI: https://pypi.org/project/jesse-report-discord/
+    # And where it will live on PyPI: https://pypi.org/project/JesseTradingViewLightReport/
     #
     # There are some restrictions on what makes a valid project name
     # specification here:
@@ -36,7 +36,7 @@ setup(
     # For a discussion on single-sourcing the version across setup.py and the
     # project code, see
     # https://packaging.python.org/guides/single-sourcing-package-version/
-    version="1.0.0",  # Required
+    version="1.0.1",  # Required
     # This is a one-line description or tagline of what your project does. This
     # corresponds to the "Summary" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#summary

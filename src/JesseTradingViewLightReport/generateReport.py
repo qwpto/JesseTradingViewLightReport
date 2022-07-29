@@ -44,12 +44,14 @@ def generateReport():
 <script>
 {{candleData}}
 
+{{orderData}}
+
 const getCandleData = async () => {
 
   const cdata = candleData.split('\n').map((row) => {
     const [time, open, high, low, close] = row.split(',');
     return {
-      time: time / 1000,
+      time: time * 1,
       open: open * 1,
       high: high * 1,
       low: low * 1,
@@ -64,11 +66,30 @@ const getVolumeData = async () => {
   const vdata = candleData.split('\n').map((row) => {
     const [time, x1, x2, x3, x4, volume] = row.split(',');
     return {
-      time: time / 1000,
+      time: time * 1,
       value: volume * 1
     };
   });
   return vdata;
+};
+
+const getOrderData = async () => {
+
+  const odata = orderData.split('\n').map((row) => {
+    const [time, mode, side, type, qty, price] = row.split(',');
+    const position = (side === 'sell')?'aboveBar':'belowBar';
+    const shape = (side === 'sell')?'arrowDown':'arrowUp';
+    const color = (side === 'sell')?'#e91e63':'#2196F3';
+    
+    return {
+      time: time * 1,
+      position: position,
+      color: color,
+      shape : shape,
+      text : type + ' @ ' + price + ' : ' + qty + mode
+    };
+  });
+  return odata;
 };
 
 const displayChart = async () => {
@@ -91,6 +112,9 @@ const displayChart = async () => {
   const candleseries = chart.addCandlestickSeries();
   const klinedata = await getCandleData();
   candleseries.setData(klinedata);
+  const odata = await getOrderData();
+  candleseries.setMarkers(odata);
+
   const histogramSeries = chart.addHistogramSeries({
         color: '#26a69a',
         priceFormat: {
@@ -126,19 +150,36 @@ displayChart();
         
         candleData =  'const candleData = `'
         for candle in candles:
-            candleData += str(candle[CD.date]) + ','            
+            candleData += str(candle[CD.date]/1000) + ','            
             candleData += str(candle[CD.open]) + ','
             candleData += str(candle[CD.high]) + ','
             candleData += str(candle[CD.low]) + ','
             candleData += str(candle[CD.close]) + ','            
             candleData += str(candle[CD.volume]) + '\n'
-            
-        
         candleData = candleData.rstrip(candleData[-1]) # remove last new line
         candleData += '`;'
 
+        orderData =  'const orderData = `'
+        for trade in store.completed_trades.trades:
+            for order in trade.orders:
+                if(order.is_executed):
+                    mode = ''
+                    if(order.is_stop_loss):
+                        mode = ' (SL)'
+                    elif(order.is_take_profit):
+                        mode = ' (TP)'                
+                    orderData += str(order.executed_at/1000) + ','            
+                    orderData += mode + ','
+                    orderData += order.side + ','
+                    orderData += order.type + ','
+                    orderData += str(order.qty) + ','            
+                    orderData += str(order.price) + '\n'
+        orderData = orderData.rstrip(orderData[-1]) # remove last new line
+        orderData += '`;'
+
         info = {'title': studyname,
-            'candleData': candleData
+            'candleData': candleData,
+            'orderData': orderData
             }
             
         result = template(tpl, info)
@@ -148,5 +189,5 @@ displayChart();
         with open(filename, "w") as f:
             f.write(result)
     
-
+        return filename
 
