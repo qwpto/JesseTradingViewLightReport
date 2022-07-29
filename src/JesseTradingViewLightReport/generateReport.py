@@ -103,9 +103,7 @@ const displayChart = async () => {
   };
   
 
-//function updateWindowSize() {
-//    chart.applyOptions({     width: window.innerWidth-20,    height: window.innerHeight-20, });
-//}  
+
 
   const domElement = document.getElementById('tvchart');
   const chart = LightweightCharts.createChart(domElement, chartProperties);
@@ -130,7 +128,11 @@ const displayChart = async () => {
   histogramSeries.setData(vdata);
   //chart.timeScale().fitContent();
   
-  //window.onresize = updateWindowSize;
+function updateWindowSize() {
+    chart.applyOptions({     width: window.innerWidth-20,    height: window.innerHeight-20, });
+}  
+
+  window.onresize = updateWindowSize;
 
 
 
