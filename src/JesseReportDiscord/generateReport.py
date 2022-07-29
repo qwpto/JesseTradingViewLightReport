@@ -16,6 +16,14 @@ import os
 
 # from jesse.strategies import Strategy
 
+from enum import IntEnum
+class CD(IntEnum):
+    date = 0
+    open = 1
+    close = 2
+    high = 3
+    low = 4
+    volume = 5
 
 def generateReport():
     if(config["app"]["trading_mode"] == 'backtest'):
@@ -34,10 +42,11 @@ def generateReport():
 </body>
 <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
 <script>
-const getData = async () => {
-  {{resp}}
+{{candleData}}
 
-  const cdata = resp.split('\n').map((row) => {
+const getCandleData = async () => {
+
+  const cdata = candleData.split('\n').map((row) => {
     const [time, open, high, low, close] = row.split(',');
     return {
       time: time / 1000,
@@ -50,21 +59,57 @@ const getData = async () => {
   return cdata;
 };
 
+const getVolumeData = async () => {
+
+  const vdata = candleData.split('\n').map((row) => {
+    const [time, x1, x2, x3, x4, volume] = row.split(',');
+    return {
+      time: time / 1000,
+      value: volume * 1
+    };
+  });
+  return vdata;
+};
+
 const displayChart = async () => {
   const chartProperties = {
-    width: 1500,
-    height: 600,
+    width: window.innerWidth-20,
+    height: window.innerHeight-20,
     timeScale: {
       timeVisible: true,
       secondsVisible: true,
     },
   };
+  
+
+//function updateWindowSize() {
+//    chart.applyOptions({     width: window.innerWidth-20,    height: window.innerHeight-20, });
+//}  
 
   const domElement = document.getElementById('tvchart');
   const chart = LightweightCharts.createChart(domElement, chartProperties);
   const candleseries = chart.addCandlestickSeries();
-  const klinedata = await getData();
+  const klinedata = await getCandleData();
   candleseries.setData(klinedata);
+  const histogramSeries = chart.addHistogramSeries({
+        color: '#26a69a',
+        priceFormat: {
+            type: 'volume',
+        },
+        priceScaleId: '',
+        scaleMargins: {
+            top: 0.8,
+            bottom: 0,
+        },
+    });
+  const vdata = await getVolumeData();
+  histogramSeries.setData(vdata);
+  //chart.timeScale().fitContent();
+  
+  //window.onresize = updateWindowSize;
+
+
+
 };
 
 displayChart();
@@ -79,18 +124,21 @@ displayChart();
         fullCandles = backtest_mode.load_candles(date_list[0].strftime('%Y-%m-%d'), date_list[-1].strftime('%Y-%m-%d'))
         candles = fullCandles[jh.key(router.routes[0].exchange, router.routes[0].symbol)]['candles']
         
-        resp =  'const resp = `'
+        candleData =  'const candleData = `'
         for candle in candles:
-            resp += str(candle[0]) + ','
-            resp += str(candle[1]) + ','
-            resp += str(candle[2]) + ','
-            resp += str(candle[3]) + ','
-            resp += str(candle[4]) + '\n'
-        resp = resp.rstrip(resp[-1]) # remove last new line
-        resp += '`;'
+            candleData += str(candle[CD.date]) + ','            
+            candleData += str(candle[CD.open]) + ','
+            candleData += str(candle[CD.high]) + ','
+            candleData += str(candle[CD.low]) + ','
+            candleData += str(candle[CD.close]) + ','            
+            candleData += str(candle[CD.volume]) + '\n'
+            
+        
+        candleData = candleData.rstrip(candleData[-1]) # remove last new line
+        candleData += '`;'
 
         info = {'title': studyname,
-            'resp': resp
+            'candleData': candleData
             }
             
         result = template(tpl, info)
