@@ -148,7 +148,8 @@ displayChart();
         start_date = datetime.fromtimestamp(store.app.starting_time / 1000) # could optimise this if the generated report already contains data, just start from where it was up to and append.
         date_list = [start_date + timedelta(days=x) for x in range(len(store.app.daily_balance))]
         fullCandles = backtest_mode.load_candles(date_list[0].strftime('%Y-%m-%d'), date_list[-1].strftime('%Y-%m-%d'))
-        candles = fullCandles[jh.key(router.routes[0].exchange, router.routes[0].symbol)]['candles']
+        #candles = fullCandles[jh.key(router.routes[0].exchange, router.routes[0].symbol)]['candles']
+        candles = store.candles.get_candles(router.routes[0].exchange, router.routes[0].symbol, router.routes[0].timeframe)
         
         candleData =  'const candleData = `'
         for candle in candles:
