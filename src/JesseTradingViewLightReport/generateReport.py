@@ -100,6 +100,9 @@ const displayChart = async () => {
       timeVisible: true,
       secondsVisible: true,
     },
+    crosshair: {
+		mode: LightweightCharts.CrosshairMode.Normal,
+	},
   };
   
 
