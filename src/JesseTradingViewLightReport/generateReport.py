@@ -25,7 +25,7 @@ class CD(IntEnum):
     low = 4
     volume = 5
 
-def generateReport():
+def generateReport(customData={}):
     if(config["app"]["trading_mode"] == 'backtest'):
         
         tpl = r"""
@@ -180,7 +180,8 @@ displayChart();
                     orderData += order.type + ','
                     orderData += str(order.qty) + ','            
                     orderData += str(order.price) + '\n'
-        orderData = orderData.rstrip(orderData[-1]) # remove last new line
+        if(orderData[-1] == '\n'):
+          orderData = orderData.rstrip(orderData[-1]) # remove last new line
         orderData += '`;'
 
         info = {'title': studyname,
