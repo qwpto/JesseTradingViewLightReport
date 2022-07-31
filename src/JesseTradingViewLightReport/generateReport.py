@@ -36,6 +36,23 @@ def generateReport(customData={}):
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}</title>
+    <style>
+      .go-to-realtime-button {
+        width: 27px;
+        height: 27px;
+        position: absolute;
+        display: none;
+        padding: 7px;
+        box-sizing: border-box;
+        font-size: 10px;
+        border-radius: 50%;
+        text-align: center;
+        z-index: 1000;
+        color: #B2B5BE;
+        background: rgba(250, 250, 250, 0.95);
+        box-shadow: 0 2px 5px 0 rgba(117, 134, 150, 0.45);
+      }
+    </style>    
 </head>
 <body>
     <div id="tvchart"></div>
@@ -92,10 +109,12 @@ const getOrderData = async () => {
   return odata;
 };
 
+var chartWidth = window.innerWidth-20;
+var chartHeight = window.innerHeight-20;
 const displayChart = async () => {
   const chartProperties = {
-    width: window.innerWidth-20,
-    height: window.innerHeight-20,
+    width: chartWidth,
+    height: chartHeight,
     timeScale: {
       timeVisible: true,
       secondsVisible: true,
@@ -130,9 +149,46 @@ const displayChart = async () => {
   const vdata = await getVolumeData();
   histogramSeries.setData(vdata);
   //chart.timeScale().fitContent();
+
+	//chart.timeScale().scrollToPosition(-20, false);
+
+	var width = 27;
+	var height = 27;
+	var button = document.createElement('div');
+	button.className = 'go-to-realtime-button';
+	button.style.left = (chartWidth - width - 60) + 'px';
+	button.style.top = (chartHeight - height - 30) + 'px';
+	button.style.color = '#4c525e';
+	button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M6.5 1.5l5 5.5-5 5.5M3 4l2.5 3L3 10"></path></svg>';
+	document.body.appendChild(button);
+
+	var timeScale = chart.timeScale();
+	timeScale.subscribeVisibleTimeRangeChange(function() {
+		var buttonVisible = timeScale.scrollPosition() < 0;
+		button.style.display = buttonVisible ? 'block' : 'none';
+	});
+
+	button.addEventListener('click', function() {
+		timeScale.scrollToRealTime();
+	});
+
+	button.addEventListener('mouseover', function() {
+		button.style.background = 'rgba(250, 250, 250, 1)';
+		button.style.color = '#000';
+	});
+
+	button.addEventListener('mouseout', function() {
+		button.style.background = 'rgba(250, 250, 250, 0.6)';
+		button.style.color = '#4c525e';
+	}); 
+
   
 function updateWindowSize() {
-    chart.applyOptions({     width: window.innerWidth-20,    height: window.innerHeight-20, });
+	chartWidth = window.innerWidth-20;
+	chartHeight = window.innerHeight-20;
+  chart.applyOptions({     width: chartWidth,    height: chartHeight, });
+	button.style.left = (chartWidth - width - 60) + 'px';
+	button.style.top = (chartHeight - height - 30) + 'px';
 }  
 
   window.onresize = updateWindowSize;
