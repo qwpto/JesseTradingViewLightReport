@@ -34,7 +34,7 @@ def generateReport(customData={}):
 
         cstLineTpl = r"""
 
-            chart.addLineSeries({{!options}}).setData(await getCustomData({{offset}}))
+            chart.add{{type}}({{!options}}).setData(await getCustomData({{offset}}))
 
         """
         
@@ -309,7 +309,9 @@ displayChart();
                 if(not 'options' in value):
                   value['options'] = {}
                 value['options']['title'] = key
-                customCharts += template(cstLineTpl, {'options':str(value['options']), 'offset':idx})
+                if(not 'type' in value):
+                  value['type']='LineSeries'
+                customCharts += template(cstLineTpl, {'options':str(value['options']), 'offset':idx, 'type':value['type']})
                 idx += 1
         
         info = {'title': studyname,
