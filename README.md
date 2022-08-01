@@ -17,7 +17,7 @@ But you can also add custom data for example:
 
 	generateReport(customData={"atr":{"data":self.atr, "options":{"pane":1, "colour":'rgba(251, 192, 45, 1)'}}, 'two':{"data":self.candles[:,1]-5, "options":{"pane":2}, "type":"HistogramSeries"}, 'three':{"data":self.candles[:,1]+5, "options":{"pane":2, "color":'purple'}}})
 
-	![alt text](https://github.com/qwpto/JesseTradingViewLightReport/blob/release/example1.jpg?raw=true)
+![alt text](https://github.com/qwpto/JesseTradingViewLightReport/blob/release/example1.png?raw=true)
 
 For more information on plot types and options see:
 - https://tradingview.github.io/lightweight-charts/docs/api
