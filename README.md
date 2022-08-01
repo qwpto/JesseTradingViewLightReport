@@ -28,3 +28,7 @@ But you can also add custom data for example:
 For more information on plot types and options see:
 - https://tradingview.github.io/lightweight-charts/docs/api
 - https://www.tradingview.com/lightweight-charts/
+
+For the moment, the data will need to be the same length as the number of candles you would receive from self.candles
+
+The different panes can be resized by dragging them with the cursor.
