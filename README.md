@@ -54,3 +54,8 @@ For more information on plot types and options see:
 For the moment, the data will need to be the same length as the number of candles you would receive from self.candles
 
 The different panes can be resized by dragging them with the cursor.
+
+The generate function returns the relative location of the file. You can also find it inside where you're running the jesse strategy from there will be a folder called storage, inside that this plugin creates a folder called JesseTradingViewLightReport. Then each time you run a strategy with different parameters it will create a unique file called something like 77cbda27-6eec-48b6-90fb-621656d9e9d8.html 
+
+So in this example it'll be:
+c:/whereveryourunjesse/storage/JesseTradingViewLightReport/77cbda27-6eec-48b6-90fb-621656d9e9d8.html
