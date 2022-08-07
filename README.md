@@ -36,7 +36,18 @@ JesseTradingViewLightReport.generateReport(
 
 ![demo](https://github.com/qwpto/JesseTradingViewLightReport/blob/release/example1.png?raw=true)
 
+Available types are:
+- LineSeries
+- HistogramSeries
+- AreaSeries
+- BaselineSeries
+
+You may be able to use:
+- BarSeries
+- CandlestickSeries
+
 For more information on plot types and options see:
+- https://tradingview.github.io/lightweight-charts/docs/series-types
 - https://tradingview.github.io/lightweight-charts/docs/api
 - https://www.tradingview.com/lightweight-charts/
 
