@@ -9,6 +9,8 @@ from jesse.routes import router
 from datetime import datetime, timedelta
 from jesse.store import store
 import jesse.services.metrics as stats
+from jesse.enums import trade_types
+
 
 import pandas as pd
 import numpy as np
@@ -152,7 +154,7 @@ const getVolumeData = async () => {
 const getOrderData = async () => {
 
   const odata = orderData.split('\n').map((row) => {
-    const [time, mode, side, type, qty, price] = row.split(',');
+    const [time, mode, side, type, qty, price, pnl_order, pnl_accumulated] = row.split(',');
     const position = (side === 'sell')?'aboveBar':'belowBar';
     const shape = (side === 'sell')?'arrowDown':'arrowUp';
     const color = (side === 'sell')?'rgba(251, 192, 45, 1)':'#2196F3';
@@ -162,10 +164,22 @@ const getOrderData = async () => {
       position: position,
       color: color,
       shape : shape,
-      text : type + ' @ ' + price + ' : ' + qty + mode
+      text : type + ' @ ' + price + ' : ' + qty + mode + ' $' + pnl_order
     };
   });
   return odata;
+};
+
+const getPnlData = async () => {
+
+  const data = orderData.split('\n').map((row) => {
+    const [time, mode, side, type, qty, price, pnl_order, pnl_accumulated] = row.split(',');
+    return {
+      time: time * 1,
+      value: pnl_accumulated * 1
+    };
+  });
+  return data;
 };
 
 const getCustomData = async (offset) => {
@@ -197,7 +211,7 @@ const displayChart = async () => {
       horzLines: {
         color: 'rgba(42, 46, 57, 0.6)',
       },
-    },
+    },{{!priceScale}}
     timeScale: {
       timeVisible: true,
       secondsVisible: true,
@@ -233,6 +247,8 @@ const displayChart = async () => {
   histogramSeries.setData(vdata);
 
   {{!customCharts}}
+
+  {{!pnlCharts}}
 
   //chart.timeScale().fitContent();
 
@@ -290,9 +306,9 @@ displayChart();
 
         file_name = jh.get_session_id()
         studyname = backtest_mode._get_study_name()
-        start_date = datetime.fromtimestamp(store.app.starting_time / 1000) # could optimise this if the generated report already contains data, just start from where it was up to and append.
-        date_list = [start_date + timedelta(days=x) for x in range(len(store.app.daily_balance))]
-        fullCandles = backtest_mode.load_candles(date_list[0].strftime('%Y-%m-%d'), date_list[-1].strftime('%Y-%m-%d'))
+        #start_date = datetime.fromtimestamp(store.app.starting_time / 1000) # could optimise this if the generated report already contains data, just start from where it was up to and append.
+        #date_list = [start_date + timedelta(days=x) for x in range(len(store.app.daily_balance))]        
+        #fullCandles = backtest_mode.load_candles(date_list[0].strftime('%Y-%m-%d'), date_list[-1].strftime('%Y-%m-%d'))
         #candles = fullCandles[jh.key(router.routes[0].exchange, router.routes[0].symbol)]['candles']
         candles = store.candles.get_candles(router.routes[0].exchange, router.routes[0].symbol, router.routes[0].timeframe)
 
@@ -344,10 +360,30 @@ displayChart();
           candleData = candleData.rstrip(candleData[-1]) # remove last new line
         candleData += '`;'
 
+        pnl_accumulated = 0
         orderData =  'const orderData = `'
         for trade in store.completed_trades.trades:
+            trading_fee = jh.get_config(f'env.exchanges.{trade.exchange}.fee')
+            average_entry_price = 0
+            average_entry_size = 0
+            side_factor = 1
+            if(trade.type == trade_types.SHORT):
+              side_factor = -1            
             for order in trade.orders:
                 if(order.is_executed):
+                    fee = abs(order.qty) * order.price * trading_fee
+                    if(((trade.type == trade_types.LONG) and (order.side == 'buy')) or ((trade.type == trade_types.SHORT) and (order.side == 'sell'))):
+                      #pnl is just fees as increasing size
+                      pnl_order = -fee
+                      average_entry_price = (average_entry_price*average_entry_size + order.price*abs(order.qty))/(average_entry_size+abs(order.qty))
+                      average_entry_size += abs(order.qty)
+                    else:
+                      #closing some position
+                      pnl_order = (order.price - average_entry_price)*abs(order.qty)*side_factor - fee
+                      average_entry_size -= abs(order.qty)
+
+                    pnl_accumulated+=pnl_order
+
                     mode = ''
                     if(order.is_stop_loss):
                         mode = ' (SL)'
@@ -357,8 +393,10 @@ displayChart();
                     orderData += mode + ','
                     orderData += order.side + ','
                     orderData += order.type + ','
-                    orderData += str(order.qty) + ','            
-                    orderData += str(order.price) + '\n'
+                    orderData += str(order.qty) + ','
+                    orderData += str(order.price) + ','
+                    orderData += str(pnl_order) + ','
+                    orderData += str(pnl_accumulated) + '\n'
         if(orderData[-1] == '\n'):
           orderData = orderData.rstrip(orderData[-1]) # remove last new line
         orderData += '`;'
@@ -375,10 +413,18 @@ displayChart();
                 customCharts += template(cstLineTpl, {'options':str(value['options']), 'offset':idx, 'type':value['type']})
                 idx += 1
         
+        pnlCharts = ''
+        priceScale = ''
+        if('pnl' in chartConfig and chartConfig['pnl']):
+          pnlCharts = 'chart.addLineSeries({color: \'rgba(4, 111, 232, 1)\', lineWidth: 1, priceScaleId: \'left\',}).setData(await getPnlData())'
+          priceScale = ' rightPriceScale: {		visible: true, borderColor: \'rgba(197, 203, 206, 1)\'	}, leftPriceScale: { visible: true, borderColor: \'rgba(197, 203, 206, 1)\'	},'
+
         info = {'title': studyname,
             'candleData': candleData,
             'orderData': orderData,
-            'customCharts':customCharts
+            'customCharts':customCharts,
+            'pnlCharts':pnlCharts,
+            'priceScale': priceScale
             }
             
         result = template(tpl, info)

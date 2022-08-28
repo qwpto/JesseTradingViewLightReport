@@ -62,8 +62,15 @@ JesseTradingViewLightReport.generateReport(chartConfig={'isPvsra':True})
 However, at the moment it is not possible to use multiple panes with this option. This restiction will be removed in a future release.
 ![demo2](https://github.com/qwpto/JesseTradingViewLightReport/blob/release/example2.png?raw=true)
 
+It is possible to also plot the profit and loss with for example:
+```python
+JesseTradingViewLightReport.generateReport(chartConfig={'pnl':True})
+```
 
 The generateReport function returns the relative location of the file. You can also find it inside where you're running the jesse strategy from there will be a folder called storage, inside that this plugin creates a folder called JesseTradingViewLightReport. Then each time you run a strategy with different parameters it will create a unique file called something like 77cbda27-6eec-48b6-90fb-621656d9e9d8.html 
 
 So in this example it'll be:
 c:/whereveryourunjesse/storage/JesseTradingViewLightReport/77cbda27-6eec-48b6-90fb-621656d9e9d8.html
+
+CHANGELOG:
+1.1.0 - added support for jesse 0.39.+, and added PNL calculation for all orders. With accumulated PNL plotting.
