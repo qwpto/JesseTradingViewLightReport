@@ -56,7 +56,7 @@ def pvsra(candles: np.ndarray, sequential = False) -> Union[float, np.ndarray]:
 
 
 def generateReport(customData={}, chartConfig={}):
-    if(config["app"]["trading_mode"] == 'backtest'):
+    if(True):#config["app"]["trading_mode"] == 'backtest'):
 
         cstLineTpl = r"""
 

@@ -74,3 +74,4 @@ c:/whereveryourunjesse/storage/JesseTradingViewLightReport/77cbda27-6eec-48b6-90
 
 CHANGELOG:
 1.1.0 - added support for jesse 0.39.+, and added PNL calculation for all orders. With accumulated PNL plotting.
+1.2.0 - Generate charts for live trading.
