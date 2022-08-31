@@ -352,8 +352,9 @@ displayChart();
 
             if(len(customData)>0):
               for key, value in customData.items():
-                candleData += ','  
-                candleData += str(value['data'][idx])
+                candleData += ','
+                if(len(value['data'])> idx):  
+                  candleData += str(value['data'][idx])
                           
             candleData += '\n'
         if(candleData[-1]=='\n'):
