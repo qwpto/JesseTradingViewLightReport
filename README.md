@@ -76,3 +76,4 @@ CHANGELOG:
 1.1.0 - added support for jesse 0.39.+, and added PNL calculation for all orders. With accumulated PNL plotting.
 1.2.0 - Generate charts for live trading.
 1.2.1 - Allow missing latest data in custom data.
+1.2.2 - added trade ID to order data.

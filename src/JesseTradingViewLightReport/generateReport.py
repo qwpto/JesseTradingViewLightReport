@@ -397,7 +397,8 @@ displayChart();
                     orderData += str(order.qty) + ','
                     orderData += str(order.price) + ','
                     orderData += str(pnl_order) + ','
-                    orderData += str(pnl_accumulated) + '\n'
+                    orderData += str(pnl_accumulated) + ','
+                    orderData += trade.id + '\n'
         if(orderData[-1] == '\n'):
           orderData = orderData.rstrip(orderData[-1]) # remove last new line
         orderData += '`;'
