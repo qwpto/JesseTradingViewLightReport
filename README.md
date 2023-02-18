@@ -27,7 +27,7 @@ But you can also add custom data for example:
 ```python
 JesseTradingViewLightReport.generateReport(
 	customData={
-		"atr":{"data":self.atr, "options":{"pane":1, "colour":'rgba(251, 192, 45, 1)'}}, 
+		"atr":{"data":self.atr, "options":{"pane":1, "color":'rgba(251, 192, 45, 1)'}}, 
 		'two':{"data":self.candles[:,1]-5, "options":{"pane":2}, "type":"HistogramSeries"}, 
 		'three':{"data":self.candles[:,1]+5, "options":{"pane":2, "color":'purple'}}
 	}
