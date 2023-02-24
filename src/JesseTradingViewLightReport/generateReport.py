@@ -61,13 +61,14 @@ def pvsra(candles: np.ndarray, sequential=False) -> pd.DataFrame:
         return df.iloc[-1]
 
 
-def generateReport(customData={}, chartConfig={}, rounding=None):
+def generateReport(customData={}, chartConfig={}):
     """
     Generate TradingView report.
     :param customData: dict of custom data
     :param chartConfig: dict with config for chart; -> {
         'isPvsra': True or False,
         'pnl': True or False,
+        'numDecimals': 3,
     }
     :param rounding: number of decimal places for numbers
     :return:
@@ -449,7 +450,7 @@ displayChart();
             priceScale = ' rightPriceScale: {		visible: true, borderColor: \'rgba(197, 203, 206, 1)\'	}, leftPriceScale: { visible: true, borderColor: \'rgba(197, 203, 206, 1)\'	},'
 
         # Get number of decimals from config, default to 2
-        numDecimals = fr"""const numDecimals = {chartConfig.get('numDecimals', 2)};"""
+        numDecimals = fr"""const numDecimals = {chartConfig.get('numDecimals', 3)};"""
 
         info = {
             'title': studyname,
